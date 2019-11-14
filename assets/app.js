@@ -27,7 +27,7 @@ $("#addNewTrain").on("click", function () {
         frequency: trainFrequency
     }
 
-    database.ref().push(newTrain);
+    trainDatabase.ref().push(newTrain);
 
     $("#trainNameInput").val("");
     $("destinationInput").val("");
@@ -41,5 +41,22 @@ trainDatabase.ref().on("child_added", function (childSnapshot) {
     var firstTrain = childSnapshot.val().earliest;
     var trainFrequency = childSnapshot.val().frequency;
 
+    var formatFirstTime = moment(firstTrain , "HH:mm") ;
+    var timeSinceFirst = moment().diff(formatFirstTime, "minutes") ;
+    var timeSinceLast = timeSinceFirst % trainFrequency ;
+    var timeToNext = trainFrequency - timeSinceLast ;
+    var nextArrivalTime = moment().add( timeToNext , "minutes").format("HH:mm") ;
 
-})
+    console.log(timeToNext);
+
+    var newRow = $("<tr>").append(
+        $("<td>").text(trainName) ,
+        $("<td>").text(trainDestination) ,
+        $("<td>").text(trainFrequency) ,
+        $("<td>").text(nextArrivalTime) ,
+        $("<td>").text(timeToNext)
+    );
+
+    $("#trainTable").append(newRow);
+
+});
